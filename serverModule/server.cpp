@@ -40,14 +40,25 @@ void ThreadProc(Server *server, int tread_id) {
                 exit(EXIT_FAILURE);       
             }
 
-            char buffer[1024];
             int bytes_read;
+            int full_bytes_read = 0;
             do
             {
-                bytes_read = recv(socketDescr, buffer, sizeof(buffer), 0);  
-                if (bytes_read > 0) {
+                char buffer[1024] = {0};
+                int freeSpace = server->getMaxFileSize() - full_bytes_read;
+                if (sizeof(buffer) > freeSpace)
+                {
+                    bytes_read = recv(socketDescr, buffer, freeSpace, 0);  
+                }
+                else 
+                {
+                    bytes_read = recv(socketDescr, buffer, sizeof(buffer), 0);
+                }
+                  
+                if ((bytes_read > 0) && ((full_bytes_read + bytes_read) <= server->getMaxFileSize())) {
                     fprintf(fileDescr, "%s", buffer);
                     printf("Buffer: %d\n", bytes_read); 
+                    full_bytes_read += bytes_read;
                 }
             }
             while (bytes_read > 0);
@@ -59,7 +70,7 @@ void ThreadProc(Server *server, int tread_id) {
     }
 }
 
-Server::Server(in_addr_t hostname, in_port_t port, int thread_count, string path)
+Server::Server(in_addr_t hostname, in_port_t port, int thread_count, string path, int maxFileSize)
 {
     /* socket creation */
     socketDescr = socket(AF_INET, SOCK_STREAM, 0);
@@ -84,6 +95,7 @@ Server::Server(in_addr_t hostname, in_port_t port, int thread_count, string path
     thraedCount = thread_count;
 
     this->path = path;
+    this-> maxFileSize = maxFileSize;
 }
 
 Server::~Server()

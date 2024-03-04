@@ -22,8 +22,9 @@ class Server
         int thraedCount;
         CompetitiveQueue* CompQueue;
         string path;
+        int maxFileSize;
     public:
-        Server(in_addr_t hostname, in_port_t port, int thread_count, string path);
+        Server(in_addr_t hostname, in_port_t port, int thread_count, string path, int maxFileSize);
         ~Server();
 
         void start();
@@ -35,5 +36,10 @@ class Server
         string getPath()
         {
             return path;
+        }
+
+        int getMaxFileSize()
+        {
+            return maxFileSize;
         }
 };

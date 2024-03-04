@@ -16,7 +16,7 @@ void sighupHeandler(int sigNum);
 
 int main(int argc, char * argv[]) {
     string hostname, path;
-    int port, maxThreadsCount;
+    int port, maxThreadsCount, maxFileSize;
 
     /* check and set arguments */
     if (argc < 6)
@@ -34,8 +34,10 @@ int main(int argc, char * argv[]) {
 
     path = argv[4];
 
+    maxFileSize = atoi(argv[5]);
+
     /* socket creation */
-    Server server = Server(inet_addr(hostname.c_str()), htons(port), maxThreadsCount, path);
+    Server server = Server(inet_addr(hostname.c_str()), htons(port), maxThreadsCount, path, maxFileSize);
 
     signal(SIGTERM, sigtermHeandler);
     signal(SIGHUP, sighupHeandler);
